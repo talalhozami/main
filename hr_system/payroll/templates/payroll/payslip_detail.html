@@ -1,0 +1,110 @@
+{% extends "employees/base.html" %}
+{% load payroll_extras %}
+
+{% block content %}
+<div class="payslip-container card">
+    <div class="card-header">
+        <h2 class="card-title text-center">Payslip</h2>
+        <div class="row">
+            <div class="col"><strong>Employee:</strong> {{ payslip.employee.first_name }} {{ payslip.employee.last_name }}</div>
+            <div class="col text-right"><strong>Pay Period:</strong> {{ payslip.pay_period.month|month_name_filter }} {{ payslip.pay_period.year }}</div>
+        </div>
+        <div class="row">
+            <div class="col"><strong>Employee ID:</strong> {{ payslip.employee.id }}</div> {# Or employee_code if you have one #}
+            <div class="col"><strong>Email:</strong> {{ payslip.employee.email }}</div>
+            <div class="col text-right"><strong>Generated On:</strong> {{ payslip.generated_on|date:"F j, Y, g:i a" }}</div>
+        </div>
+         <div class="row">
+            <div class="col"><strong>Department:</strong> {{ payslip.employee.department }}</div>
+            <div class="col text-right"><strong>Job Title:</strong> {{ payslip.employee.job_title }}</div>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Earnings</h4>
+                <table class="table table-sm">
+                    <tr>
+                        <td>Basic Salary</td>
+                        <td class="text-right">{{ payslip.basic_salary_paid|floatformat:2 }}</td>
+                    </tr>
+                    <tr>
+                        <td>Housing Allowance</td>
+                        <td class="text-right">{{ payslip.housing_allowance_paid|floatformat:2 }}</td>
+                    </tr>
+                    <tr>
+                        <td>Transport Allowance</td>
+                        <td class="text-right">{{ payslip.transport_allowance_paid|floatformat:2 }}</td>
+                    </tr>
+                    <tr>
+                        <td>Other Allowances</td>
+                        <td class="text-right">{{ payslip.other_allowances_paid|floatformat:2 }}</td>
+                    </tr>
+                    <tr class="font-weight-bold table-info">
+                        <td>Gross Salary</td>
+                        <td class="text-right">{{ payslip.gross_salary|floatformat:2 }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-md-6">
+                <h4>Deductions</h4>
+                <table class="table table-sm">
+                    <tr>
+                        <td>Income Tax</td>
+                        <td class="text-right">{{ payslip.income_tax_deducted|floatformat:2 }}</td>
+                    </tr>
+                    <tr>
+                        <td>Provident Fund</td>
+                        <td class="text-right">{{ payslip.provident_fund_deducted|floatformat:2 }}</td>
+                    </tr>
+                    <tr>
+                        <td>Other Deductions</td>
+                        <td class="text-right">{{ payslip.other_deductions_made|floatformat:2 }}</td>
+                    </tr>
+                    <tr class="font-weight-bold table-warning">
+                        <td>Total Deductions</td>
+                        <td class="text-right">{{ payslip.total_deductions_amount|floatformat:2 }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <hr>
+        <div class="row mt-3">
+            <div class="col text-center">
+                <h3 class="font-weight-bold">Net Salary Paid: {{ payslip.net_salary_paid|floatformat:2 }}</h3>
+            </div>
+        </div>
+        {% if payslip.notes %}
+        <div class="row mt-3">
+            <div class="col">
+                <strong>Notes:</strong>
+                <p>{{ payslip.notes }}</p>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="card-footer text-muted">
+        Payment Status: <span class="badge badge-{% if payslip.payment_status == 'PAID' %}success{% elif payslip.payment_status == 'PENDING' %}warning{% else %}danger{% endif %}">{{ payslip.get_payment_status_display }}</span>
+        <button onclick="window.print()" class="btn btn-sm btn-secondary float-right ml-2">Print</button>
+        <a href="{% url 'payroll:payslip_list' %}" class="btn btn-sm btn-outline-primary float-right">Back to List</a>
+    </div>
+</div>
+
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        .payslip-container, .payslip-container * {
+            visibility: visible;
+        }
+        .payslip-container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+        .btn { display: none !important; } /* Hide buttons on print */
+    }
+</style>
+{% endblock %}

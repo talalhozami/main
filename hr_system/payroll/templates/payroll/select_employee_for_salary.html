@@ -1,0 +1,13 @@
+{% extends "employees/base.html" %}
+
+{% block content %}
+<h2>Assign or Update Salary Structure</h2>
+<p>Select an employee to define or update their salary structure. If a structure already exists, you will be taken to the update page.</p>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Proceed</button>
+    <a href="{% url 'payroll:salarystructure_list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

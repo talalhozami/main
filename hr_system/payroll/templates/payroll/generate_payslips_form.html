@@ -1,0 +1,54 @@
+{% extends "employees/base.html" %}
+
+{% block content %}
+<h2>Generate Payslips for Period</h2>
+
+<form method="post" class="form">
+    {% csrf_token %}
+
+    <div class="row">
+        <div class="col-md-4 form-group">
+            <label for="{{ form.year.id_for_label }}">{{ form.year.label }}</label>
+            {{ form.year }}
+            {% for error in form.year.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+        <div class="col-md-4 form-group">
+            <label for="{{ form.month.id_for_label }}">{{ form.month.label }}</label>
+            {{ form.month }}
+            {% for error in form.month.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+        </div>
+    </div>
+
+    {# Uncomment if using specific employee selection in the form #}
+    {# <div class="form-group">
+        <label for="{{ form.employees.id_for_label }}">{{ form.employees.label }}</label>
+        {{ form.employees }}
+        {% if form.employees.help_text %}<small class="form-text text-muted">{{ form.employees.help_text }}</small>{% endif %}
+        {% for error in form.employees.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+    </div> #}
+
+    <div class="form-group form-check">
+        {{ form.force_regenerate }}
+        <label class="form-check-label" for="{{ form.force_regenerate.id_for_label }}">
+            {{ form.force_regenerate.label }}
+        </label>
+        {% if form.force_regenerate.help_text %}<small class="form-text text-muted">{{ form.force_regenerate.help_text }}</small>{% endif %}
+        {% for error in form.force_regenerate.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Generate Payslips</button>
+    <a href="{% url 'payroll:payslip_list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+
+<script>
+// Basic script to add 'form-control' class to select elements if not already done by a widget
+document.addEventListener('DOMContentLoaded', function() {
+    var formElements = document.querySelectorAll('form select');
+    formElements.forEach(function(el) {
+        if (!el.classList.contains('form-control')) {
+            el.classList.add('form-control');
+        }
+    });
+});
+</script>
+{% endblock %}

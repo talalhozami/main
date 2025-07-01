@@ -1,0 +1,97 @@
+{% extends "employees/base.html" %}
+
+{% block content %}
+<h2>{% if form.instance.pk %}Update{% else %}Create{% endif %} Salary Structure</h2>
+{% if form.instance.pk %}
+    <p><strong>Employee:</strong> {{ form.instance.employee.first_name }} {{ form.instance.employee.last_name }}</p>
+{% elif employee_id_from_url %}
+    {# This part might be tricky if employee is not directly in form context #}
+    {# Consider passing employee object to context if creating for specific one #}
+{% endif %}
+
+<form method="post">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Earnings</h4>
+            {% if not form.instance.pk and not form.fields.employee.disabled %}
+            <div class="form-group">
+                <label for="{{ form.employee.id_for_label }}">{{ form.employee.label }}</label>
+                {{ form.employee }}
+                {% if form.employee.help_text %}<small class="form-text text-muted">{{ form.employee.help_text }}</small>{% endif %}
+                {% for error in form.employee.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+            {% endif %}
+            <div class="form-group">
+                <label for="{{ form.basic_salary.id_for_label }}">{{ form.basic_salary.label }}</label>
+                {{ form.basic_salary }}
+                {% if form.basic_salary.help_text %}<small class="form-text text-muted">{{ form.basic_salary.help_text }}</small>{% endif %}
+                {% for error in form.basic_salary.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.housing_allowance.id_for_label }}">{{ form.housing_allowance.label }}</label>
+                {{ form.housing_allowance }}
+                {% for error in form.housing_allowance.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.transport_allowance.id_for_label }}">{{ form.transport_allowance.label }}</label>
+                {{ form.transport_allowance }}
+                {% for error in form.transport_allowance.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.other_allowances.id_for_label }}">{{ form.other_allowances.label }}</label>
+                {{ form.other_allowances }}
+                {% for error in form.other_allowances.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+        </div>
+        <div class="col-md-6">
+            <h4>Deductions</h4>
+            <div class="form-group">
+                <label for="{{ form.income_tax.id_for_label }}">{{ form.income_tax.label }}</label>
+                {{ form.income_tax }}
+                {% if form.income_tax.help_text %}<small class="form-text text-muted">{{ form.income_tax.help_text }}</small>{% endif %}
+                {% for error in form.income_tax.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.provident_fund.id_for_label }}">{{ form.provident_fund.label }}</label>
+                {{ form.provident_fund }}
+                {% if form.provident_fund.help_text %}<small class="form-text text-muted">{{ form.provident_fund.help_text }}</small>{% endif %}
+                {% for error in form.provident_fund.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="form-group">
+                <label for="{{ form.other_deductions.id_for_label }}">{{ form.other_deductions.label }}</label>
+                {{ form.other_deductions }}
+                {% for error in form.other_deductions.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">{% if form.instance.pk %}Update{% else %}Save{% endif %} Structure</button>
+    <a href="{% url 'payroll:salarystructure_list' %}" class="btn btn-secondary">Cancel</a>
+</form>
+
+<script>
+// Basic script to add 'form-control' class to all input, select, textarea elements if not already done by a widget
+document.addEventListener('DOMContentLoaded', function() {
+    var formElements = document.querySelectorAll('form input, form select, form textarea');
+    formElements.forEach(function(el) {
+        if (!el.classList.contains('form-control') && el.type !== 'checkbox' && el.type !== 'radio' && el.type !== 'hidden' && el.type !== 'file' && el.type !== 'submit' && el.type !== 'button' && el.type !== 'reset') {
+            //el.classList.add('form-control');
+        }
+        // For select elements specifically, ensure they are styled if not using a custom widget
+        if (el.tagName === 'SELECT' && !el.classList.contains('form-control')) {
+           // el.classList.add('form-control');
+        }
+    });
+});
+</script>
+{% endblock %}

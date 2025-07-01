@@ -1,0 +1,80 @@
+{% extends "employees/base.html" %}
+{% load payroll_extras %} {# Assuming you'll create a templatetags folder #}
+
+{% block content %}
+<h2>Payslips</h2>
+<div class="row mb-3">
+    <div class="col-md-6">
+        <a href="{% url 'payroll:generate_payslips' %}" class="btn btn-primary">Generate Payslips for Period</a>
+    </div>
+    <div class="col-md-6">
+        <form method="get" class="form-inline float-md-right">
+            {{ filter_form.as_p }}
+            <button type="submit" class="btn btn-info ml-2">Filter</button>
+        </form>
+    </div>
+</div>
+
+{% if payslips %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Pay Period</th>
+                <th>Gross Salary</th>
+                <th>Total Deductions</th>
+                <th>Net Salary Paid</th>
+                <th>Status</th>
+                <th>Generated On</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payslip in payslips %}
+            <tr>
+                <td>{{ payslip.employee.first_name }} {{ payslip.employee.last_name }}</td>
+                <td>{{ payslip.pay_period.month|month_name_filter }} {{ payslip.pay_period.year }}</td>
+                <td>{{ payslip.gross_salary }}</td>
+                <td>{{ payslip.total_deductions_amount }}</td>
+                <td>{{ payslip.net_salary_paid }}</td>
+                <td><span class="badge badge-{% if payslip.payment_status == 'PAID' %}success{% elif payslip.payment_status == 'PENDING' %}warning{% else %}danger{% endif %}">{{ payslip.get_payment_status_display }}</span></td>
+                <td>{{ payslip.generated_on|date:"Y-m-d H:i" }}</td>
+                <td>
+                    <a href="{% url 'payroll:payslip_detail' payslip.pk %}" class="btn btn-sm btn-info">View</a>
+                    {# Add edit/delete later if needed, though payslips are often immutable once generated #}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if is_paginated %}
+        <nav aria-label="Page navigation">
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Previous</a></li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                {% endif %}
+
+                {% for i in paginator.page_range %}
+                    {% if page_obj.number == i %}
+                        <li class="page-item active"><span class="page-link">{{ i }} <span class="sr-only">(current)</span></span></li>
+                    {% else %}
+                        <li class="page-item"><a class="page-link" href="?page={{ i }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ i }}</a></li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Next</a></li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">Next</span></li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+
+{% else %}
+    <p>No payslips found matching your criteria. <a href="{% url 'payroll:generate_payslips' %}">Generate some now</a>.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,37 @@
+{% extends "employees/base.html" %}
+
+{% block content %}
+<h2>Salary Structures</h2>
+<a href="{% url 'payroll:select_employee_for_salary' %}" class="btn btn-primary mb-3">Assign/Update Salary Structure</a>
+{% if structures %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Basic Salary</th>
+                <th>Total Earnings</th>
+                <th>Total Deductions</th>
+                <th>Net Salary</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for structure in structures %}
+            <tr>
+                <td>{{ structure.employee.first_name }} {{ structure.employee.last_name }}</td>
+                <td>{{ structure.basic_salary }}</td>
+                <td>{{ structure.total_earnings }}</td>
+                <td>{{ structure.total_deductions }}</td>
+                <td>{{ structure.net_salary }}</td>
+                <td>
+                    <a href="{% url 'payroll:salarystructure_update' structure.pk %}" class="btn btn-sm btn-secondary">Edit</a>
+                    {# Add delete view later if needed #}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No salary structures found. <a href="{% url 'payroll:select_employee_for_salary' %}">Assign one now</a>.</p>
+{% endif %}
+{% endblock %}
